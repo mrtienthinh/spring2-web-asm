@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/template.html}">
+<head>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Category</strong> new
+                </div>
+                <div class="card-body card-block">
+                    <form onsubmit="return false;" id="categoryForm" action="/api/category" th:attr="method=${category.id > 0 ? 'PUT' : 'POST'}" class="form-horizontal">
+                        <input type="hidden" name="id" th:value="${category.id}"/>
+                        <div class="row form-group">
+                            <div class="col col-md-3">
+                                <label for="hf-name" class=" form-control-label">Name</label>
+                            </div>
+                            <div class="col-12 col-md-9">
+                                <input type="text" id="hf-name" name="name" placeholder="Enter name..." class="form-control" th:value="${category.name}">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer">
+                    <button type="button" class="btn btn-primary btn-sm" id="save">
+                        <i class="fa fa-dot-circle-o"></i> Submit
+                    </button>
+                    <a href="/category" class="btn btn-danger btn-sm" role="button">
+                        <i class="fa fa-ban"></i> Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script layout:fragment="script">
+    $("#save").on("click", function (e) {
+        e.preventDefault();
+        $("#save").attr("disabled", true);
+        var form = $("#categoryForm");
+        $.ajax({
+            type: form.attr('method'),
+            url: form[0].action,
+            data: JSON.stringify(getFormData(form)),
+            dataType : 'json',
+            contentType: "application/json",
+            success: function(data) {
+                setTimeout(() => {
+                    window.location.assign("/category");
+                }, 2000);
+                toastr.info('Success', `Add new category successful!`);
+            },
+            error: function(data) {
+                $("#save").removeAttr("disabled");
+                toastr.error('Error', `Message: ${data}`);
+                console.log(data);
+            }
+        });
+    })
+</script>
+
+</html>

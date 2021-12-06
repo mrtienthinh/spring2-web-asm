@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/template.html}">
+<head>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Product</strong> new
+                </div>
+                <div class="card-body card-block">
+                    <form onsubmit="return false;"  id="productForm" action="/api/product" th:attr="method=${product.id > 0 ? 'PUT' : 'POST'}" class="form-horizontal">
+                        <input type="hidden" name="id" th:value="${product.id}"/>
+                        <div class="row form-group">
+                            <div class="col col-md-3">
+                                <label for="hf-name" class=" form-control-label">Name</label>
+                            </div>
+                            <div class="col-12 col-md-9">
+                                <input type="text" id="hf-name" name="name" placeholder="Enter name..." class="form-control" th:value="${product.name}">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col col-md-3">
+                                <label for="hf-price" class=" form-control-label">Price</label>
+                            </div>
+                            <div class="col-12 col-md-9">
+                                <input type="number" id="hf-price" name="price" placeholder="Enter price..." class="form-control" th:value="${product.price}">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col col-md-3">
+                                <label for="hf-quantity" class=" form-control-label">Quantity</label>
+                            </div>
+                            <div class="col-12 col-md-9">
+                                <input type="number" id="hf-quantity" name="quantity" placeholder="Enter quantity..." class="form-control" th:value="${product.quantity}">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col col-md-3">
+                                <label for="select" class=" form-control-label">Category</label>
+                            </div>
+                            <div class="col-12 col-md-9">
+                                <select name="categoryId" id="select" class="form-control">
+                                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id == product.categoryId}"/>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer">
+                    <button type="button" class="btn btn-primary btn-sm" id="save">
+                        <i class="fa fa-dot-circle-o"></i> Submit
+                    </button>
+                    <a href="/product" class="btn btn-danger btn-sm" role="button">
+                        <i class="fa fa-ban"></i> Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script layout:fragment="script">
+    $("#save").on("click", function (e) {
+        e.preventDefault();
+        $("#save").attr("disabled", true);
+        var form = $("#productForm");
+        $.ajax({
+            type: form.attr('method'),
+            url: form[0].action,
+            data: JSON.stringify(getFormData(form)),
+            dataType : 'json',
+            contentType: "application/json",
+            success: function(data) {
+                setTimeout(() => {
+                    window.location.assign("/product");
+                }, 2000);
+                toastr.info('Success', `Add new product successful!`);
+
+            },
+            error: function(data) {
+                $("#save").attr("disabled", false);
+                toastr.error('Error', `Message: ${data}`);
+                console.log(data);
+            }
+        });
+    })
+</script>
+</body>
+
+</html>
